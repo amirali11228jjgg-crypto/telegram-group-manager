@@ -1,89 +1,107 @@
-from telegram import Update
+import logging
+
 from telegram.ext import (
     Application,
     CommandHandler,
-    ContextTypes,
     MessageHandler,
     filters
 )
-from telegram.error import TelegramError
 
 from config import BOT_TOKEN
-from database import create_tables
+
+from database import init_db
+
+from commands import (
+    warn,
+    warnings,
+    ban,
+    kick,
+    mute,
+    unmute
+)
+
+from filters import (
+    delete_links,
+    word_filter
+)
 
 
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+# فعال کردن لاگ
+logging.basicConfig(
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    level=logging.INFO
+)
+
+
+async def start(update, context):
     await update.message.reply_text(
-        "سلام 👋\nربات محافظ گروه فعال شد 🛡️"
+        "🤖 ربات مدیریت گروه فعال شد."
     )
 
 
-async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text(
-        "دستورات ربات:\n\n"
-        "/start - فعال بودن ربات\n"
-        "/help - راهنما\n"
-        "/ban - بن کردن با ریپلای\n"
-        "بن - بن کردن با ریپلای"
-    )
+async def main():
+
+    # ساخت دیتابیس
+    await init_db()
+
+    # ساخت ربات
+    app = Application.builder().token(
+        BOT_TOKEN
+    ).build()
 
 
-async def ban_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if not update.message.reply_to_message:
-        await update.message.reply_text(
-            "❌ روی پیام کاربر ریپلای کن و بعد بن را بزن"
-        )
-        return
-
-    user = update.message.reply_to_message.from_user
-
-    try:
-        await context.bot.ban_chat_member(
-            chat_id=update.effective_chat.id,
-            user_id=user.id
-        )
-
-        await update.message.reply_text(
-            f"🚫 {user.first_name} بن شد."
-        )
-
-    except TelegramError:
-        await update.message.reply_text(
-            "❌ نتوانستم کاربر را بن کنم."
-        )
-
-
-async def text_ban(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if update.message.text in ["بن", "/بن"]:
-        await ban_user(update, context)
-
-
-async def delete_links(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if update.message and update.message.text:
-        if "http" in update.message.text:
-            await update.message.delete()
-
-
-def main():
-    create_tables()
-
-    app = Application.builder().token(BOT_TOKEN).build()
-
-    app.add_handler(CommandHandler("start", start))
-    app.add_handler(CommandHandler("help", help_command))
-
-    # دستور انگلیسی
-    app.add_handler(CommandHandler("ban", ban_user))
-
-    # دستور فارسی
+    # دستورات اصلی
     app.add_handler(
-        MessageHandler(
-            filters.TEXT & ~filters.COMMAND,
-            text_ban
+        CommandHandler(
+            "start",
+            start
         )
     )
 
-    # حذف لینک
+    app.add_handler(
+        CommandHandler(
+            "warn",
+            warn
+        )
+    )
+
+    app.add_handler(
+        CommandHandler(
+            "warnings",
+            warnings
+        )
+    )
+
+    app.add_handler(
+        CommandHandler(
+            "ban",
+            ban
+        )
+    )
+
+    app.add_handler(
+        CommandHandler(
+            "kick",
+            kick
+        )
+    )
+
+    app.add_handler(
+        CommandHandler(
+            "mute",
+            mute
+        )
+    )
+
+    app.add_handler(
+        CommandHandler(
+            "unmute",
+            unmute
+        )
+    )
+
+
+    # فیلتر پیام‌ها
     app.add_handler(
         MessageHandler(
             filters.TEXT & ~filters.COMMAND,
@@ -91,10 +109,22 @@ def main():
         )
     )
 
-    print("Bot is running...")
+    app.add_handler(
+        MessageHandler(
+            filters.TEXT & ~filters.COMMAND,
+            word_filter
+        )
+    )
 
-    app.run_polling()
+
+    print("Bot started...")
+
+
+    # اجرای دائمی
+    await app.run_polling()
 
 
 if __name__ == "__main__":
-    main()
+    import asyncio
+
+    asyncio.run(main())
