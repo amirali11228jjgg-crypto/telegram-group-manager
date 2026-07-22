@@ -112,4 +112,72 @@ async def warn(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         await update.message.reply_text(
             f"🚫 {user.first_name} به دلیل ۳ اخطار بن شد."
+        )async def mute(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
+    if not await is_admin(update):
+        return
+
+    if not update.message.reply_to_message:
+        await update.message.reply_text(
+            "❌ روی پیام کاربر ریپلای کن."
         )
+        return
+
+    user = update.message.reply_to_message.from_user
+
+    await update.effective_chat.restrict_member(
+        user.id,
+        permissions={
+            "can_send_messages": False
+        }
+    )
+
+    await update.message.reply_text(
+        f"🔇 {user.first_name} سکوت شد."
+    )
+
+
+async def unmute(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
+    if not await is_admin(update):
+        return
+
+    if not update.message.reply_to_message:
+        await update.message.reply_text(
+            "❌ روی پیام کاربر ریپلای کن."
+        )
+        return
+
+    user = update.message.reply_to_message.from_user
+
+    await update.effective_chat.restrict_member(
+        user.id,
+        permissions={
+            "can_send_messages": True,
+            "can_send_media_messages": True
+        }
+    )
+
+    await update.message.reply_text(
+        f"🔊 {user.first_name} رفع سکوت شد."
+    )
+
+
+async def warnings(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
+    if not update.message.reply_to_message:
+        await update.message.reply_text(
+            "❌ روی پیام کاربر ریپلای کن."
+        )
+        return
+
+    user = update.message.reply_to_message.from_user
+
+    count = await get_warns(
+        update.effective_chat.id,
+        user.id
+    )
+
+    await update.message.reply_text(
+        f"⚠️ اخطارهای {user.first_name}: {count}"
+    )
