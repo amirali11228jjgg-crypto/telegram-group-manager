@@ -1,4 +1,5 @@
 import logging
+import asyncio
 
 from telegram.ext import (
     Application,
@@ -26,6 +27,7 @@ from filters import (
 
 
 logging.basicConfig(
+    format="%(asctime)s - %(levelname)s - %(message)s",
     level=logging.INFO
 )
 
@@ -36,23 +38,16 @@ async def start(update, context):
     )
 
 
-async def post_init(application):
+async def setup(application):
     await init_db()
 
 
 def main():
 
-    print(
-        "TOKEN CHECK:",
-        BOT_TOKEN[:10] if BOT_TOKEN else "NO TOKEN"
-    )
-
-
     app = (
-        Application
-        .builder()
+        Application.builder()
         .token(BOT_TOKEN)
-        .post_init(post_init)
+        .post_init(setup)
         .build()
     )
 
@@ -92,7 +87,6 @@ def main():
             delete_links
         )
     )
-
 
     app.add_handler(
         MessageHandler(
