@@ -23,7 +23,8 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "دستورات ربات:\n\n"
         "/start - فعال بودن ربات\n"
         "/help - راهنما\n"
-        "/بن یا /ban - بن کردن با ریپلای"
+        "/ban - بن کردن با ریپلای\n"
+        "بن - بن کردن با ریپلای"
     )
 
 
@@ -52,15 +53,15 @@ async def ban_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
 
 
+async def text_ban(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if update.message.text in ["بن", "/بن"]:
+        await ban_user(update, context)
+
+
 async def delete_links(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.message and update.message.text:
         if "http" in update.message.text:
             await update.message.delete()
-
-
-async def text_ban(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if update.message.text in ["بن", "ban"]:
-        await ban_user(update, context)
 
 
 def main():
@@ -71,11 +72,10 @@ def main():
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("help", help_command))
 
-    # دستورات /بن و /ban
-    app.add_handler(CommandHandler("بن", ban_user))
+    # دستور انگلیسی
     app.add_handler(CommandHandler("ban", ban_user))
 
-    # بن بدون /
+    # دستور فارسی
     app.add_handler(
         MessageHandler(
             filters.TEXT & ~filters.COMMAND,
