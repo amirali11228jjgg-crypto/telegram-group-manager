@@ -1,5 +1,4 @@
 import logging
-import asyncio
 
 from telegram.ext import (
     Application,
@@ -9,7 +8,6 @@ from telegram.ext import (
 )
 
 from config import BOT_TOKEN
-
 from database import init_db
 
 from commands import (
@@ -28,62 +26,40 @@ from filters import (
 
 
 logging.basicConfig(
-    format="%(asctime)s - %(levelname)s - %(message)s",
     level=logging.INFO
 )
 
 
 async def start(update, context):
-
     await update.message.reply_text(
         "🤖 ربات مدیریت گروه فعال شد."
     )
 
 
+async def post_init(application):
+    await init_db()
+
+
 def main():
 
-    # ساخت دیتابیس
-    asyncio.run(init_db())
-
-
-    # ساخت ربات
-    app = Application.builder().token(
-        BOT_TOKEN
-    ).build()
-
-
-    # دستورات
-
-    app.add_handler(
-        CommandHandler("start", start)
-    )
-
-    app.add_handler(
-        CommandHandler("warn", warn)
-    )
-
-    app.add_handler(
-        CommandHandler("warnings", warnings)
-    )
-
-    app.add_handler(
-        CommandHandler("ban", ban)
-    )
-
-    app.add_handler(
-        CommandHandler("kick", kick)
-    )
-
-    app.add_handler(
-        CommandHandler("mute", mute)
-    )
-
-    app.add_handler(
-        CommandHandler("unmute", unmute)
+    app = (
+        Application
+        .builder()
+        .token(BOT_TOKEN)
+        .post_init(post_init)
+        .build()
     )
 
 
-    # فیلتر پیام‌ها
+    app.add_handler(CommandHandler("start", start))
+
+    app.add_handler(CommandHandler("warn", warn))
+    app.add_handler(CommandHandler("warnings", warnings))
+    app.add_handler(CommandHandler("ban", ban))
+    app.add_handler(CommandHandler("kick", kick))
+    app.add_handler(CommandHandler("mute", mute))
+    app.add_handler(CommandHandler("unmute", unmute))
+
 
     app.add_handler(
         MessageHandler(
@@ -102,10 +78,7 @@ def main():
 
     print("Bot started...")
 
-
-    # اجرای ربات
     app.run_polling()
-
 
 
 if __name__ == "__main__":
