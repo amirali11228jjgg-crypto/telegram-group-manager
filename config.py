@@ -1,6 +1,5 @@
 import os
-from dotenv import load_dotenv
 
-load_dotenv()
+BOT_TOKEN = os.environ.get("BOT_TOKEN")
 
-BOT_TOKEN = os.getenv("BOT_TOKEN")
+print("TOKEN CHECK:", BOT_TOKEN[:10] if BOT_TOKEN else "EMPTY")
