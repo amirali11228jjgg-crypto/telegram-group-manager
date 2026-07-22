@@ -42,6 +42,12 @@ async def post_init(application):
 
 def main():
 
+    print(
+        "TOKEN CHECK:",
+        BOT_TOKEN[:10] if BOT_TOKEN else "NO TOKEN"
+    )
+
+
     app = (
         Application
         .builder()
@@ -51,14 +57,33 @@ def main():
     )
 
 
-    app.add_handler(CommandHandler("start", start))
+    app.add_handler(
+        CommandHandler("start", start)
+    )
 
-    app.add_handler(CommandHandler("warn", warn))
-    app.add_handler(CommandHandler("warnings", warnings))
-    app.add_handler(CommandHandler("ban", ban))
-    app.add_handler(CommandHandler("kick", kick))
-    app.add_handler(CommandHandler("mute", mute))
-    app.add_handler(CommandHandler("unmute", unmute))
+    app.add_handler(
+        CommandHandler("warn", warn)
+    )
+
+    app.add_handler(
+        CommandHandler("warnings", warnings)
+    )
+
+    app.add_handler(
+        CommandHandler("ban", ban)
+    )
+
+    app.add_handler(
+        CommandHandler("kick", kick)
+    )
+
+    app.add_handler(
+        CommandHandler("mute", mute)
+    )
+
+    app.add_handler(
+        CommandHandler("unmute", unmute)
+    )
 
 
     app.add_handler(
@@ -67,6 +92,7 @@ def main():
             delete_links
         )
     )
+
 
     app.add_handler(
         MessageHandler(
@@ -77,6 +103,7 @@ def main():
 
 
     print("Bot started...")
+
 
     app.run_polling()
 
