@@ -17,7 +17,8 @@ from commands import (
     ban,
     kick,
     mute,
-    unmute
+    unmute,
+    unban
 )
 
 from filters import (
