@@ -4,11 +4,10 @@ from telegram.ext import (
     Application,
     CommandHandler,
     MessageHandler,
-    filters,
+    filters
 )
 
 from config import BOT_TOKEN
-
 from database import init_db
 
 from commands import (
@@ -18,40 +17,37 @@ from commands import (
     warn,
     mute,
     unmute,
-    warnings,
+    warnings
 )
 
 from filters import link_filter
 
 
 logging.basicConfig(
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     level=logging.INFO
 )
 
 
 async def start(update, context):
-
     await update.message.reply_text(
         "🤖 ربات مدیریت گروه فعال شد."
     )
 
 
-async def setup(app):
-
+async def post_init(application):
     await init_db()
 
 
 def main():
 
-    app = Application.builder().token(
-        BOT_TOKEN
-    ).post_init(
-        setup
-    ).build()
+    app = (
+        Application
+        .builder()
+        .token(BOT_TOKEN)
+        .post_init(post_init)
+        .build()
+    )
 
-
-    # دستورات انگلیسی
 
     app.add_handler(
         CommandHandler("start", start)
@@ -85,8 +81,6 @@ def main():
         CommandHandler("warnings", warnings)
     )
 
-
-    # حذف لینک
 
     app.add_handler(
         MessageHandler(
