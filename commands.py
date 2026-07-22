@@ -168,4 +168,18 @@ async def unmute(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await update.message.reply_text(
         f"🔊 {target.first_name} رفع سکوت شد."
-    )
+    async def unban(update, context):
+    if update.message.reply_to_message:
+        user = update.message.reply_to_message.from_user
+
+        await update.effective_chat.unban_member(
+            user.id
+        )
+
+        await update.message.reply_text(
+            f"✅ {user.first_name} رفع بن شد."
+        )
+    else:
+        await update.message.reply_text(
+            "❌ روی پیام کاربر ریپلای کن."
+        )
