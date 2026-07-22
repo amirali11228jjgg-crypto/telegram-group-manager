@@ -1,4 +1,5 @@
 import logging
+import asyncio
 
 from telegram.ext import (
     Application,
@@ -26,23 +27,24 @@ from filters import (
 )
 
 
-# فعال کردن لاگ
 logging.basicConfig(
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    format="%(asctime)s - %(levelname)s - %(message)s",
     level=logging.INFO
 )
 
 
 async def start(update, context):
+
     await update.message.reply_text(
         "🤖 ربات مدیریت گروه فعال شد."
     )
 
 
-async def main():
+def main():
 
     # ساخت دیتابیس
-    await init_db()
+    asyncio.run(init_db())
+
 
     # ساخت ربات
     app = Application.builder().token(
@@ -50,58 +52,39 @@ async def main():
     ).build()
 
 
-    # دستورات اصلی
+    # دستورات
+
     app.add_handler(
-        CommandHandler(
-            "start",
-            start
-        )
+        CommandHandler("start", start)
     )
 
     app.add_handler(
-        CommandHandler(
-            "warn",
-            warn
-        )
+        CommandHandler("warn", warn)
     )
 
     app.add_handler(
-        CommandHandler(
-            "warnings",
-            warnings
-        )
+        CommandHandler("warnings", warnings)
     )
 
     app.add_handler(
-        CommandHandler(
-            "ban",
-            ban
-        )
+        CommandHandler("ban", ban)
     )
 
     app.add_handler(
-        CommandHandler(
-            "kick",
-            kick
-        )
+        CommandHandler("kick", kick)
     )
 
     app.add_handler(
-        CommandHandler(
-            "mute",
-            mute
-        )
+        CommandHandler("mute", mute)
     )
 
     app.add_handler(
-        CommandHandler(
-            "unmute",
-            unmute
-        )
+        CommandHandler("unmute", unmute)
     )
 
 
     # فیلتر پیام‌ها
+
     app.add_handler(
         MessageHandler(
             filters.TEXT & ~filters.COMMAND,
@@ -120,11 +103,10 @@ async def main():
     print("Bot started...")
 
 
-    # اجرای دائمی
-    await app.run_polling()
+    # اجرای ربات
+    app.run_polling()
+
 
 
 if __name__ == "__main__":
-    import asyncio
-
-    asyncio.run(main())
+    main()
