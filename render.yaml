@@ -2,5 +2,11 @@ services:
   - type: worker
     name: telegram-group-manager
     runtime: python
+
     buildCommand: pip install -r requirements.txt
+
     startCommand: python main.py
+
+    envVars:
+      - key: BOT_TOKEN
+        sync: false
