@@ -1,68 +1,60 @@
 import logging
-import asyncio
 
 from telegram.ext import (
     Application,
     CommandHandler,
     MessageHandler,
-    filters
+    filters,
 )
 
 from config import BOT_TOKEN
+
 from database import init_db
 
 from commands import (
-    warn,
-    warnings,
     ban,
+    unban,
     kick,
+    warn,
     mute,
     unmute,
-    u)
+    warnings,
 )
 
-from filters import (
-    delete_links,
-    word_filter
-)
+from filters import link_filter
 
 
 logging.basicConfig(
-    format="%(asctime)s - %(levelname)s - %(message)s",
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     level=logging.INFO
 )
 
 
 async def start(update, context):
+
     await update.message.reply_text(
         "🤖 ربات مدیریت گروه فعال شد."
     )
 
 
-async def setup(application):
+async def setup(app):
+
     await init_db()
 
 
 def main():
 
-    app = (
-        Application.builder()
-        .token(BOT_TOKEN)
-        .post_init(setup)
-        .build()
-    )
+    app = Application.builder().token(
+        BOT_TOKEN
+    ).post_init(
+        setup
+    ).build()
 
+
+    # دستورات انگلیسی
 
     app.add_handler(
         CommandHandler("start", start)
-    )
-
-    app.add_handler(
-        CommandHandler("warn", warn)
-    )
-
-    app.add_handler(
-        CommandHandler("warnings", warnings)
     )
 
     app.add_handler(
@@ -70,7 +62,15 @@ def main():
     )
 
     app.add_handler(
+        CommandHandler("unban", unban)
+    )
+
+    app.add_handler(
         CommandHandler("kick", kick)
+    )
+
+    app.add_handler(
+        CommandHandler("warn", warn)
     )
 
     app.add_handler(
@@ -81,24 +81,22 @@ def main():
         CommandHandler("unmute", unmute)
     )
 
-
     app.add_handler(
-        MessageHandler(
-            filters.TEXT & ~filters.COMMAND,
-            delete_links
-        )
+        CommandHandler("warnings", warnings)
     )
 
+
+    # حذف لینک
+
     app.add_handler(
         MessageHandler(
             filters.TEXT & ~filters.COMMAND,
-            word_filter
+            link_filter
         )
     )
 
 
     print("Bot started...")
-
 
     app.run_polling()
 
