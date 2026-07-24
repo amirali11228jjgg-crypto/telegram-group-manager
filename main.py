@@ -14,9 +14,9 @@ from commands import (
     ban,
     unban,
     kick,
-    warn,
     mute,
     unmute,
+    warn,
     warnings
 )
 
@@ -24,6 +24,7 @@ from filters import link_filter
 
 
 logging.basicConfig(
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     level=logging.INFO
 )
 
@@ -36,9 +37,12 @@ async def start(update, context):
 
 async def setup(application):
     await init_db()
+    print("Database ready")
 
 
 def main():
+
+    print("Starting bot...")
 
     app = (
         Application.builder()
@@ -64,15 +68,15 @@ def main():
     )
 
     app.add_handler(
-        CommandHandler("warn", warn)
-    )
-
-    app.add_handler(
         CommandHandler("mute", mute)
     )
 
     app.add_handler(
         CommandHandler("unmute", unmute)
+    )
+
+    app.add_handler(
+        CommandHandler("warn", warn)
     )
 
     app.add_handler(
@@ -86,7 +90,7 @@ def main():
         )
     )
 
-    print("Bot started...")
+    print("Bot is running...")
 
     app.run_polling()
 
